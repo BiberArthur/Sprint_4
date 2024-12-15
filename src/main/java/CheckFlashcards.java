@@ -38,7 +38,6 @@ public class CheckFlashcards {
         return driver.findElement(firstResultText).getText(); // Получаем текст результата
     }
 
-
     public void clickButtoneTwo() {
         driver.findElement(secondHeading).click(); // Кликаем по второму заголовку
     }
@@ -47,7 +46,6 @@ public class CheckFlashcards {
         wait.until(ExpectedConditions.visibilityOfElementLocated(secondResultText)); // Ждем, пока текст станет видимым
         return driver.findElement(secondResultText).getText(); // Получаем текст результата
     }
-
 
     public void clickButtoneThree() {
         driver.findElement(thirdHeading).click(); // Кликаем по третьему заголовку
@@ -97,7 +95,6 @@ public class CheckFlashcards {
            wait.until(ExpectedConditions.visibilityOfElementLocated(seventhResultText)); // Ждем, пока текст станет видимым
            return driver.findElement(seventhResultText).getText(); // Получаем текст результата
        }
-
 
     public void clickButtoneEight() {
         driver.findElement(eighthHeading).click(); // Кликаем по восьмому заголовку

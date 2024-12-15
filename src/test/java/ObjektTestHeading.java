@@ -72,14 +72,14 @@ public class ObjektTestHeading {
     @Before
     public void setUp() {
         ChromeOptions options = new ChromeOptions();
-        options.addArguments("--no-sandbox", "--headless", "--disable-dev-shm-usage");
-
+        options.addArguments("--no-sandbox", "--disable-dev-shm-usage");
         driver = new ChromeDriver(options);
+        driver.manage().timeouts().implicitlyWait(3, TimeUnit.SECONDS);
+
         driver.get("https://qa-scooter.praktikum-services.ru");
         WebElement elementCookie = driver.findElement(By.className("App_CookieButton__3cvqF"));
         elementCookie.click();
         checkFlashcards = new CheckFlashcards(driver); // Создаем экземпляр CheckFlashcards, передавая драйвер
-
 
     }
 
@@ -92,24 +92,25 @@ public class ObjektTestHeading {
         // Находим заголовок по локатору и получаем его текст
         WebElement headingElement = driver.findElement(headingLocator); // Ищем заголовок
         String actualHeadingText = headingElement.getText(); // Получаем текст заголовка
-        Assert.assertEquals("Тексты заголовков не совпадают!", headingText, actualHeadingText); // Сравниваем с ожидаемым текстом
-
         // Кликаем по заголовку
         headingElement.click(); // Кликаем по заголовку, если текст совпадает
 
-        // Ждем, пока текст результата станет видимым
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
-        wait.until(ExpectedConditions.visibilityOfElementLocated(resultLocator)); // Ждем, пока текст результата станет видимым
 
-        // Получаем текст результата
+
         String actualResultText = driver.findElement(resultLocator).getText(); // Получаем текст результата
 
-        // Сравниваем фактический текст с ожидаемым
-        Assert.assertEquals("Тексты результатов не совпадают!", expectedResultText, actualResultText); // Проверяем, совпадают ли тексты
+        String errorMessage = "Тексты не совпадают! Ожидаемый заголовок: " + headingText +
+                ", фактический: " + actualHeadingText +
+                "; Ожидаемый результат: " + expectedResultText +
+                ", фактический: " + actualResultText;
+
+        // Выполняем одно assert для обеих проверок
+        Assert.assertTrue(errorMessage,
+                headingText.equals(actualHeadingText) && expectedResultText.equals(actualResultText));
     }
 
     @After // Метод, выполняемый после каждого теста
     public void tearDown() {
-        driver.quit(); // Освобождаем ресурсы и закрываем браузер
+        driver.quit(); // Освобождаем ресурсы и закрываем
     }
 }

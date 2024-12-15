@@ -22,84 +22,56 @@ public class ObjektTestOrder {
     @Before // Метод, выполняемый перед каждым тестом
     public void openPage() {
         ChromeOptions options = new ChromeOptions(); // Создаем объект для настройки опций Chrome
-        options.addArguments("--no-sandbox", "--headless", "--disable-dev-shm-usage"); // Добавляем аргументы для запуска без интерфейса и управления размерами памяти
+
+        options.addArguments("--no-sandbox", "--disable-dev-shm-usage"); // Добавляем аргументы для запуска без интерфейса и управления размерами памяти
 
         driver = new ChromeDriver(options); // Инициализируем драйвер с заданными опциями
         driver.get("https://qa-scooter.praktikum-services.ru"); // Открываем веб-страницу с тестовым приложением
-        WebElement elementCookie = driver.findElement(By.className("App_CookieButton__3cvqF"));
-        elementCookie.click();
+        driver.manage().timeouts().implicitlyWait(5, TimeUnit.SECONDS);
         objForRegistration = new ForRegistration(driver);
+        objForRegistration.clickCookieButton(); // нажимаем на кнопку куки
     }
     @Test
     public void createNewOeder() {
-        WebElement element = driver.findElement(By.className("Header_Disclaimer__3VEni"));
-        ((JavascriptExecutor)driver).executeScript("arguments[0].scrollIntoView();", element);
+        objForRegistration.scrollToElement(); // cкролим
 
         objForRegistration.clickFirstButtonOrder(); // Открываем окно заказа с первой кнопки
         // Заполняем форму для заказа
-        objForRegistration.clickNameFeld();
-        driver.findElement(objForRegistration.nameFeld).sendKeys("Иван"); // Вводим имя
+        objForRegistration.fillOrderForm("Ольга", "Петрова", "Санкт-Петербург, улица 2",
+                "89992223344");
 
-        objForRegistration.clickSurnameFeld();
-        driver.findElement(objForRegistration.surnameFeld).sendKeys("Иванов"); // Вводим фамилию
-        objForRegistration.clickAdresseFeld();
-        driver.findElement(objForRegistration.adresseFeld).sendKeys("Москва, улица 1"); // Вводим адрес
-        objForRegistration.clickMetroFeld();
-        objForRegistration.clickTheStation(); // Выбираем станцию метро
-        objForRegistration.clickTelephoneFeld();
-        driver.findElement(objForRegistration.telephoneFeld).sendKeys("89994445555"); // Вводим телефон
         objForRegistration.clickButtoneNex(); // Нажимаем "Далее"
 
-
         // Выбор даты и срока аренды
-
-        driver.findElement(objForRegistration.rentalDateFeld).sendKeys("12.12.2024"); // Вводим дату
-        WebElement element1 = driver.findElement(By.className("Order_Header__BZXOb"));
-                element1.click(); // кликаем по элементу на фоне чтобы закрыть календарик
-        objForRegistration.clickRentalPeriodeFeld();
-        objForRegistration.clickTimePeriod(); // Выбираем срок аренды
-        objForRegistration.clickColorFeld(); // Выбираем цвет
-        objForRegistration.clickCommentFeld(); // Вводим комментарий
+        objForRegistration.selectRentalDetails("24.12.2024");
         objForRegistration.clickButtonOrderRedy(); // Нажимаем кнопку "Заказать"
-        objForRegistration.clickYesButton(); // кликаем "да"
+
+        objForRegistration.clickYesButton(); // кликаем "да" СОБСТВЕНННО ТУТ БАГ (на хроме кнопка не кликабельна)
 
         // Проверяем статус заказа
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
         wait.until(ExpectedConditions.visibilityOfElementLocated(objForRegistration.modalHeaderGutStatus)); // Ожидаем, пока появится сообщение о статусе заказа
         boolean isOrderSuccessful = objForRegistration.checkOrder(); // Проверяем, что заказ оформлен
         Assert.assertTrue("Заказ не был успешно оформлен!", isOrderSuccessful); // Подтверждаем, что заказ был успешным
+
     }
 
     @Test
     public void createNewOrderWithSecondButton() {
         // Прокручиваем к второй кнопке регистрации
-        WebElement secondButton = driver.findElement(By.className("Home_SubHeader__zwi_E"));
-        scrollToElement(secondButton);
+        objForRegistration.scrollToSecondElement();
         objForRegistration.clickSecondButtonOrder(); // Открываем окно заказа со второй кнопки
 
         // Заполняем форму для заказа
-        objForRegistration.clickNameFeld();
-        driver.findElement(objForRegistration.nameFeld).sendKeys("Ольга"); // Вводим имя
-        objForRegistration.clickSurnameFeld();
-        driver.findElement(objForRegistration.surnameFeld).sendKeys("Петрова"); // Вводим фамилию
-        objForRegistration.clickAdresseFeld();
-        driver.findElement(objForRegistration.adresseFeld).sendKeys("Санкт-Петербург, улица 2"); // Вводим адрес
-        objForRegistration.clickMetroFeld();
-        objForRegistration.clickTheStation(); // Выбираем станцию метро
-        objForRegistration.clickTelephoneFeld();
-        driver.findElement(objForRegistration.telephoneFeld).sendKeys("89992223344"); // Вводим телефон
+        objForRegistration.fillOrderForm("Иван", "Тестович", "Санкт-Петербург, улица 5",
+                "89999999999");
+
         objForRegistration.clickButtoneNex(); // Нажимаем "Далее"
 
         // Выбор даты и срока аренды
-        driver.findElement(objForRegistration.rentalDateFeld).sendKeys("12.12.2024"); // Вводим дату
-        WebElement element1 = driver.findElement(By.className("Order_Header__BZXOb"));
-        element1.click(); // Кликаем по элементу на фоне, чтобы закрыть календарик
-        objForRegistration.clickRentalPeriodeFeld();
-        objForRegistration.clickTimePeriod(); // Выбираем срок аренды
-        objForRegistration.clickColorFeld(); // Выбираем цвет
-        objForRegistration.clickCommentFeld(); // Вводим комментарий
+        objForRegistration.selectRentalDetails("28.12.2024");
         objForRegistration.clickButtonOrderRedy(); // Нажимаем кнопку "Заказать"
-        objForRegistration.clickYesButton(); // Кликаем "да"
+        objForRegistration.clickYesButton(); // кликаем "да"
 
         // Проверяем статус заказа
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(5));
